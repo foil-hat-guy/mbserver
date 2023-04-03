@@ -90,7 +90,8 @@ func (s *Server) handler() {
 	for {
 		request := <-s.requestChan
 		response := s.handle(request)
-        if response.Bytes()[1] != 131 {
+        // If it is an exception 12 (Ignore request) then skip, otherwise - write.
+        if !((response.Bytes()[1] > 128) && (response.Bytes()[2] == 12)) {
             request.conn.Write(response.Bytes())
         }
 	}
