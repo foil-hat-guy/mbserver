@@ -90,7 +90,9 @@ func (s *Server) handler() {
 	for {
 		request := <-s.requestChan
 		response := s.handle(request)
-		request.conn.Write(response.Bytes())
+        if response.Bytes()[1] != (12 | 0x80) {
+            request.conn.Write(response.Bytes())
+        }
 	}
 }
 

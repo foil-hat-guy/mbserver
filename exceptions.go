@@ -28,6 +28,8 @@ var (
 	GatewayPathUnavailable Exception = 10
 	// GatewayTargetDeviceFailedtoRespond Specialized for Modbus gateways. Sent when slave fails to respond.
 	GatewayTargetDeviceFailedtoRespond Exception = 11
+    // Ignore request by the choice of server logic (for innstance if the slave address is not right).
+    IgnoreRequest Exception = 12
 )
 
 func (e Exception) Error() string {
@@ -59,6 +61,8 @@ func (e Exception) String() string {
 		str = fmt.Sprintf("GatewayPathUnavailable")
 	case GatewayTargetDeviceFailedtoRespond:
 		str = fmt.Sprintf("GatewayTargetDeviceFailedtoRespond")
+    case IgnoreRequest:
+        str = fmt.Sprintf("IgnoreRequest")
 	default:
 		str = fmt.Sprintf("unknown")
 	}
