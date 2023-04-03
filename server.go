@@ -23,6 +23,7 @@ type Server struct {
 	Coils            []byte
 	HoldingRegisters []uint16
 	InputRegisters   []uint16
+    Address          uint8
 }
 
 // Request contains the connection and Modbus frame.
@@ -32,7 +33,7 @@ type Request struct {
 }
 
 // NewServer creates a new Modbus server (slave).
-func NewServer() *Server {
+func NewServer(newAddress uint8) *Server {
 	s := &Server{}
 
 	// Allocate Modbus memory maps.
@@ -53,6 +54,7 @@ func NewServer() *Server {
 
 	s.requestChan = make(chan *Request)
 	s.portsCloseChan = make(chan struct{})
+    s.Address = newAddress
 
 	go s.handler()
 
@@ -89,9 +91,8 @@ func (s *Server) handle(request *Request) Framer {
 func (s *Server) handler() {
 	for {
 		request := <-s.requestChan
-		response := s.handle(request)
-        // If it is an exception 12 (Ignore request) then skip, otherwise - write.
-        if !((response.Bytes()[1] > 128) && (response.Bytes()[2] == 12)) {
+		if request.frame.Bytes()[0] == s.Address {
+            response := s.handle(request)
             request.conn.Write(response.Bytes())
         }
 	}
